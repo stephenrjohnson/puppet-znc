@@ -1,40 +1,6 @@
-# Class: znc::config
-#
-# Description
-#  This class is designed to configure the system to use ZNC after packages have been deployed
-#
-# Parameters:
-#   $auth_type: (plain|sasl). Will determine to use local auth or SASL auth.
-#   $ssl: (true|false). To enable or disable SSL support. Will autogen a SSL certificate.
-#   $port: port to run ZNC on.
-#   $organizationName: Org Name for SSL Self Signed Cert
-#   $localityName: City for SSL Self Signed Cert
-#   $stateOrProvinceName: State or Province for SSL Self Signed Cert
-#   $countryName: Country for SSL Self Signed Cert
-#   $emailAddress: Admin email for SSL Self Signed Cert
-#   $commonName: Common Name for SSL Self Signed Cert
-# 
-# Actions:
-#  - Sets up ZNC Seed Configuration
-#  - Sets up SSL (if configured)
-#  - Sets up Regular Users from params [znc::user]
-#  - Sets up Admin Users from params [znc::user, admin => true]
-#
-# Requires:
-#  This module has no requirements
-#
-# Sample Usage:
-#  This module should not be called directly.
 class znc::config(
-  $auth_type,
+  $port,
   $ssl,
-  $organizationName,
-  $localityName,
-  $stateOrProvinceName,
-  $countryName,
-  $emailAddress,
-  $commonName,
-  $port
 ) {
   File {
     owner => $znc::params::zc_user,
@@ -91,33 +57,6 @@ class znc::config(
      mode   => '0700',
      content => template('znc/bin/clean_znc_users.erb'),
   }
-
-  # Bootstrap SSL
-  if $ssl == 'true' {
-    file { "${znc::params::zc_config_dir}/ssl":
-      ensure => directory,
-      mode   => '0600',
-    }
-    file { "${znc::params::zc_config_dir}/bin":
-      ensure => directory,
-    }
-    file { "${znc::params::zc_config_dir}/bin/generate_znc_ssl":
-      ensure  => file,
-      mode    => '0755',
-      content => template('znc/bin/generate_znc_ssl.erb'),
-      require => File["${znc::params::zc_config_dir}/ssl"],
-    }
-    file { "${znc::params::zc_config_dir}/znc.pem":
-      ensure  => 'file',
-      mode    => '0600',
-      require => Exec['create-self-signed-znc-ssl'],
-    }
-    exec { 'create-self-signed-znc-ssl':
-      command => "${znc::params::zc_config_dir}/bin/generate_znc_ssl",
-      creates => "${znc::params::zc_config_dir}/znc.pem",
-    }
-  }
-
   # Bootstrap config files
   exec { 'initialize-znc-config':
     command => "cat ${znc::params::zc_config_dir}/configs/znc.conf.header > ${znc::params::zc_config_dir}/configs/znc.conf",
