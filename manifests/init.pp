@@ -9,7 +9,7 @@ class znc(
   service { 'znc':
     ensure  => 'running',
     enable  => 'true',
-    require => Package['$znc::params::zc_packages'],
+    require => Package[$znc::params::zc_packages],
   }
   class { 'znc::config':
        ssl                 => $ssl,
