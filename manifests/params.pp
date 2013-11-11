@@ -35,8 +35,6 @@ class znc::params {
 
   $zc_user       = 'znc'
   $zc_group      = 'znc'
-  $zc_uid        = '400'
-  $zc_gid        = '400'
   $zc_config_dir = '/etc/znc'
   $zc_auth_type  = 'plain'
   $zc_ssl        =  false

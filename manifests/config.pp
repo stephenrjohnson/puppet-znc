@@ -13,15 +13,12 @@ class znc::config(
 
   user { $znc::params::zc_user:
     ensure     => present,
-    uid        => $znc::params::zc_uid,
-    gid        => $znc::params::zc_gid,
     shell      => '/bin/bash',
     comment    => 'ZNC Service Account',
     managehome => 'true',
   }
   group { $znc::params::zc_group:
     ensure => present,
-    gid    => $znc::params::zc_gid,
   }
   file { $znc::params::zc_config_dir:
     ensure => directory,
@@ -57,6 +54,7 @@ class znc::config(
      mode   => '0700',
      content => template('znc/bin/clean_znc_users.erb'),
   }
+
   # Bootstrap config files
   exec { 'initialize-znc-config':
     command => "cat ${znc::params::zc_config_dir}/configs/znc.conf.header > ${znc::params::zc_config_dir}/configs/znc.conf",
